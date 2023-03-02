@@ -17,7 +17,6 @@ const showTabContent = (i = 0) => {
 }
 showTabContent()
 
-// дз задание первое
 let c = 0;
 const slider = e => {
     setInterval((i) => {
@@ -77,7 +76,7 @@ const message = {
     loading: 'Loading...',
     success: "Thank you, we'll be in touch soon!!!",
     fail: "Something went wrong :(",
-    error: "Something went server :("
+
 }
 
 const forms = document.querySelectorAll('form')
@@ -90,52 +89,57 @@ const postData = (form) => {
         messageBlock.textContent = message.loading
         diolog.append(messageBlock)
 
-        const request = new XMLHttpRequest()
-        request.open("POST", "server.php")
-        request.setRequestHeader("Content-type", "application/json")
+        fetch('sevrer.php')
+            .then(response => response.json())
+            .then(response => {
 
-        const formData = new FormData(form)
-        const object = {}
+               try{
+                const formData = new FormData(form)
+                const object = {}
 
-        formData.forEach((item, i) => {
-            const arr = [item, i]
-            console.log(arr);
-            object[i] = item
-        })
-        console.log(object);
-        const json = JSON.stringify(object)
-        request.send(json)
+                formData.forEach((item, i) => {
+                    const arr = [item, i]
+                    console.log(arr);
+                    object[i] = item
+                })
+                console.log(object);
+                const json = JSON.stringify(object)
+                request.send(json)
 
-        const closeMessage = function () {
-            setTimeout(() => {
-                messageBlock.remove()
-            }, 4000);
-        }
-        request.onload = () => {
-            setTimeout(() => {
-                messageBlock.textContent = message.loading
-                if (request.status == 200) {
-                    console.log('ok')
-                    messageBlock.textContent = message.success
-                    messageBlock.style.background = 'rgb(236, 231, 237)'
-                    messageBlock.style.color = 'rgb(70, 173, 29)'
-                    closeMessage()
+                const closeMessage = function () {
                     setTimeout(() => {
-                        closeModal()
-                    }, 4500);
-                    
-                    document.getElementById('input1').value = ''
-                    document.getElementById('input2').value = ''
+                        messageBlock.remove()
+                    }, 4000);
                 }
-                else {
-                    console.log("not ok")
-                    messageBlock.textContent = message.fail
-                    messageBlock.style.background = 'red'
-                    closeMessage()
-                }
-            }, 1500);
-        }
+                request.onload = () => {
+                    setTimeout(() => {
+                        messageBlock.textContent = message.loading
+                        if (request.status == 200) {
+                            console.log('ok')
+                            messageBlock.textContent = message.success
+                            messageBlock.style.background = 'rgb(236, 231, 237)'
+                            messageBlock.style.color = 'rgb(70, 173, 29)'
+                            closeMessage()
+                            setTimeout(() => {
+                                closeModal()
+                            }, 4500);
 
+                            document.getElementById('input1').value = ''
+                            document.getElementById('input2').value = ''
+                        }
+                        else {
+                            console.log("not ok")
+                            messageBlock.textContent = message.fail
+                            messageBlock.style.background = 'red'
+                            closeMessage()
+                        }
+                    }, 1500);
+                }
+               }
+               catch{
+                console.error('error')
+               }
+            })
     }
 
 }

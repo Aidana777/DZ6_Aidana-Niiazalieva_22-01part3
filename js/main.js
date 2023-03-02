@@ -122,10 +122,7 @@ const postData = (form) => {
                     closeMessage()
                     setTimeout(() => {
                         closeModal()
-                    }, 4500);if(request.status == 400){
-                        messageBlock.textContent = message.error
-                        messageBlock.style.background = 'red'
-                    }
+                    }, 4500);
                     
                     document.getElementById('input1').value = ''
                     document.getElementById('input2').value = ''

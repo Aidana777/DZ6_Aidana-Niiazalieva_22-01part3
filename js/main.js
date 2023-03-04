@@ -78,54 +78,59 @@ const message = {
     fail: "Something went wrong :(",
 
 }
+const post = (url, data) =>
+{
+    const res = fetch(url, {
+        method: 'POST',
+        headers: { 'Content-type': 'application/json' },
+        body: data
+    })
+    return res
+}
 
 const forms = document.querySelectorAll('form')
-const postData = (form) => {
-    form.onsubmit = (e) => {
+const postData = (form) =>
+{
+    form.onsubmit = (e) =>
+    {
         e.preventDefault()
 
         const messageBlock = document.createElement('div')
         messageBlock.setAttribute('class', 'messageBlock')
         messageBlock.textContent = message.loading
         diolog.append(messageBlock)
+        const formData = new FormData(form)
+        const object = {}
 
-        fetch('sevrer.php')
-            .then(response => response.json())
-            .then(response => {
+        formData.forEach((item, i) =>
+        {
+            const arr = [item, i]
+            console.log(arr);
+            object[i] = item
+        })
+        const json = JSON.stringify(object)
 
-               try{
-                const formData = new FormData(form)
-                const object = {}
+        const closeMessage = function ()
+        {
+            setTimeout(() =>
+            {
+                messageBlock.remove()
+            }, 3000);
+        }
+       
+        post('server.php', json)
+            .then((data) =>
+            {
+                try{
 
-                formData.forEach((item, i) => {
-                    const arr = [item, i]
-                    console.log(arr);
-                    object[i] = item
-                })
-                console.log(object);
-                const json = JSON.stringify(object)
-                request.send(json)
-
-                const closeMessage = function () {
+                    console.log(data)
                     setTimeout(() => {
-                        messageBlock.remove()
-                    }, 4000);
-                }
-                request.onload = () => {
-                    setTimeout(() => {
-                        messageBlock.textContent = message.loading
-                        if (request.status == 200) {
+                        if (data.status == 200) {
                             console.log('ok')
                             messageBlock.textContent = message.success
                             messageBlock.style.background = 'rgb(236, 231, 237)'
                             messageBlock.style.color = 'rgb(70, 173, 29)'
                             closeMessage()
-                            setTimeout(() => {
-                                closeModal()
-                            }, 4500);
-
-                            document.getElementById('input1').value = ''
-                            document.getElementById('input2').value = ''
                         }
                         else {
                             console.log("not ok")
@@ -135,15 +140,24 @@ const postData = (form) => {
                         }
                     }, 1500);
                 }
-               }
-               catch{
-                console.error('error')
-               }
+                
+                catch{
+
+                    console.error(e)
+                    setTimeout(() => {
+                        console.log("not ok")
+                        messageBlock.textContent = message.fail
+                        messageBlock.style.background = 'red'
+                        closeMessage()
+                    }, 1500);
+                
+                }
             })
     }
-
+    
 }
-forms.forEach((item) => {
+forms.forEach((item) =>
+{
     postData(item)
 })
 
